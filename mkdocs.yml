@@ -6,6 +6,10 @@ theme:
 plugins:
   - search
 
+extra_javascript:
+  - path: javascripts/mermaid.mjs
+    type: module
+
 nav:
   - Главная: index.md
   - Проект:
