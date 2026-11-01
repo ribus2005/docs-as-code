@@ -1,0 +1,126 @@
+openapi: 3.0.3
+
+info:
+  title: Uniform detector Project API
+  description: API для работы с детектором спец. формы
+  version: 1.0.0
+
+paths:
+
+  /classifications:
+    post:
+      summary: Классификация изображения
+      description: Классификация изображения на спец. форму или не спец. форму
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Успешная классификация
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClassificationResult'
+                    description: Результат классификации - вероятности ношения формы для людей в кадре
+        '400':
+          description: Ошибка в запросе (например, отсутствует файл)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Сообщение об ошибке
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Сообщение об ошибке
+
+  /alarm_score/{id}:
+    get:
+      summary: Получить статистику отрицательных результатов классификации по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Статистика отрицательных результатов классификации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  negative_result_score:
+                    type: number
+                    format: float
+                    example: 0.67
+        '400':
+          description: Неверный ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Сообщение об ошибке
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Сообщение об ошибке
+
+  /health:
+    get:
+      summary: Проверка состояния сервиса
+      responses:
+        '200':
+          description: Сервис работает
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Сообщение об ошибке
+
+components:
+  schemas:
+    ClassificationResult:
+      type: object
+      properties:
+        confidence:
+          type: number
+          format: float
+          example: 0.67
+          description: Вероятность ношения формы
