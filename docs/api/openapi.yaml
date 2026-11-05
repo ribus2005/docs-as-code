@@ -33,7 +33,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/ClassificationResult'
-                    description: Результат классификации - вероятности ношения формы для людей в кадре
+                    description: Результаты для каждого обнаруженного человека с его идентификатором
         '400':
           description: Ошибка в запросе (например, отсутствует файл)
           content:
@@ -57,11 +57,12 @@ paths:
 
   /alarm_score/{id}:
     get:
-      summary: Получить статистику отрицательных результатов классификации по ID
+      summary: Получить статистику отрицательных результатов классификации человека
       parameters:
         - name: id
           in: path
           required: true
+          description: Идентификатор человека (person_id из POST /classifications). Статистика собирается по результатам с этим person_id.
           schema:
             type: string
       responses:
@@ -118,7 +119,12 @@ components:
   schemas:
     ClassificationResult:
       type: object
+      required: [person_id, confidence]
       properties:
+        person_id:
+          type: string
+          example: person-42
+          description: Идентификатор отслеживаемого человека, сохраняемый между кадрами. Используется как id в GET /alarm_score/{id}.
         confidence:
           type: number
           format: float
